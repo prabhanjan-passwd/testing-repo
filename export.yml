@@ -1,7 +1,18 @@
-- name: test demo export
+---
+- name: Export all Controller assets
   hosts: localhost
+  gather_facts: false
   tasks:
-    - name: Export all assets
+    - name: Export everything from Controller
       ansible.controller.export:
         all: true
-  
+        controller_host: "https://192.168.122.72"
+        controller_username: "admin"
+        controller_password: "redhat"
+        validate_certs: false
+      register: export_results
+
+    - name: Save export to file
+      copy:
+        content: "{{ export_results.assets | to_nice_json }}"
+        dest: "/tmp/controller_export.json"
