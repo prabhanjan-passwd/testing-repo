@@ -12,7 +12,15 @@
         validate_certs: false
       register: export_results
 
-    - name: Save export to file
+    - name: Save export to temporary file inside EE
       copy:
         content: "{{ export_results.assets | to_nice_json }}"
         dest: "/tmp/controller_export.json"
+
+    - name: Copy export file to controller host /root
+      delegate_to: 192.168.122.79
+      become: true
+      copy:
+        src: "/tmp/controller_export.json"
+        dest: "/root/controller_export.json"
+        mode: '0600'
