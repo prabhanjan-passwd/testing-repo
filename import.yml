@@ -1,0 +1,12 @@
+---
+- name: Export all Controller assets
+  hosts: localhost
+  gather_facts: false
+  tasks:
+  
+    - name: Import all assets from our export
+      import:
+         assets: controller_export.json 
+
+
+
