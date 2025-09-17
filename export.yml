@@ -1,0 +1,7 @@
+- name: test demo export
+  hosts: localhost
+  tasks:
+    - name: Export all assets
+      export:
+        all: true
+  
