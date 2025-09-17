@@ -18,9 +18,7 @@
         dest: "/tmp/controller_export.json"
 
     - name: Copy export file to controller host /root
-      delegate_to: 192.168.122.79
-      become: true
-      copy:
+      ansible.builtin.fetch:
         src: "/tmp/controller_export.json"
         dest: "/root/controller_export.json"
-        mode: '0600'
+        flat: yes
