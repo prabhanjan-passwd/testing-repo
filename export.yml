@@ -17,8 +17,10 @@
         content: "{{ export_results.assets | to_nice_json }}"
         dest: "/tmp/controller_export.json"
 
-    - name: Copy export file to controller host /root
-      ansible.builtin.fetch:
+    - name: Copy export file to controller node /root
+      delegate_to: 192.168.122.79
+      become: true
+      copy:
         src: "/tmp/controller_export.json"
         dest: "/root/controller_export.json"
-        flat: yes
+        mode: '0600'
