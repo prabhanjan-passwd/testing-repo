@@ -1,12 +1,16 @@
 ---
-- name: Export all Controller assets
+- name: Import all Controller assets into containerized environment
   hosts: localhost
   gather_facts: false
   tasks:
-  
-    - name: Import all assets from our export
-      import:
-         assets: controller_export.json 
+    - name: Load export file
+      set_fact:
+        export_assets: "{{ lookup('file', '/root/controller_export.json') | from_json }}"
 
-
-
+    - name: Import everything into containerized Controller
+      ansible.controller.import:
+        assets: "{{ export_assets }}"
+        controller_host: "https://10.74.230.28"
+        controller_username: "admin"
+        controller_password: "redhat"
+        validate_certs: false
