@@ -1,0 +1,104 @@
+---
+## These variables need to be defined here or inside your job template ##
+aap_username:
+aap_password:
+aap_hostname:
+
+## org name
+my_org: Oracle DB Services
+
+## user team assignment
+users_to_teams_mapping:
+- team_id: Oracle_Dev_team
+  users:
+    - test_oracle
+- team_id: Oracle_Ops_team
+  users: 
+    - test_oracle
+- team_id: CaaC_Demo_Audit_team
+  users:
+    - test_oracle
+
+## create teams ##
+aap_teams:
+- name: CaaC_Demo_Audit_team
+  organization: "{{ my_org }}"
+
+gateway_role_team_assignments:
+  - team: CaaC_Demo_Audit_team
+    assignment_objects:
+      - name: "{{ my_org }}"
+        type: organizations
+    role_definition: Organization Audit
+
+## inventories ##
+controller_inventories:
+  - name: CaaC demo inventory
+    organization: "{{ my_org }}"
+
+## hosts ##
+controller_hosts:
+  - name: localhost
+    inventory: CaaC demo inventory
+    variables:
+      ansible_connection: local
+
+## credentials ##
+controller_credentials:
+  - name: caac_demo_token
+    credential_type: Source Control
+    organization: "{{ my_org }}"
+    inputs:
+      username: auth2
+      password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62616233353563616562356437333661633665393961383631333761313563663830393535313264
+          3733363637353132646334356430656461646131326562300a623734376438613130336139376430
+          32646239343330373337643162386237333233356266303963636538356534363666376231323930
+          3339386239386464660a666561393462366265383838393239633535646333616436623264376139
+          62383534636430613863323239363962623431363965656334316461363830343237386137303736
+          64383666313762626664663765356132383933616330326665626338616563333864303839353933
+          653735303330383738626134633131396138
+
+## projects ##
+controller_projects:
+  - name: CaaC demo
+    organization: "{{ my_org }}"
+    credential: caac_demo_token
+    scm_type: git
+    scm_update_on_launch: true
+    scm_url: https://labelasslegit01.lab-ds.gc.ca:8443/automation/caac-demo.git
+
+controller_templates:
+  - name: Get team object ID using team name
+    playbook: caac_get_team_id_play.yml
+    inventory: CaaC demo inventory
+    job_type: run
+    organization: "{{ my_org }}"
+    project: CaaC demo
+    execution_environment: aap_exec_2.6
+    ask_variables_on_launch: true
+    extra_vars:
+      aap_fqdn: labelassleaap01.lab-ds.gc.ca
+      my_teams: 
+        - CaaC_Demo_Audit_team
+    survey_enabled: true
+    survey_spec:
+      name: Your AAP user name and password
+      description: Your AAP user name and password
+      spec:
+        - question_name: Your AAP user name
+          required: true
+          variable: my_username
+          type: text
+        - question_name: Your AAP user password
+          required: true
+          variable: my_password
+          type: password
+
+## add users into teams ##
+gateway_role_user_assignments:
+  - user: "{{ myuser }}"
+    role_definition: Team Member
+    object_ids:
+      - "{{ item.team_id }}"
