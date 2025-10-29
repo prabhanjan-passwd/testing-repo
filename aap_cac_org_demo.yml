@@ -1,0 +1,42 @@
+---
+- name: Configure AAP
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - cac_demo_vars_oracle.yml
+
+  tasks:
+    - name: Configure AAP Controller Credentials
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.controller_credentials
+      no_log: false
+
+    - name: Configure AAP Controller Inventories
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.controller_inventories
+
+    - name: Configure AAP Controller Hosts
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.controller_hosts
+
+    - name: Configure AAP Controller Projects
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.controller_projects
+
+    - name: Configure AAP Controller Job Templates
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.controller_job_templates
+
+    - name: Create teams
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.gateway_teams
+      when: aap_teams is defined and aap_teams is not none
+
+    - name: Add roles to teams
+      ansible.builtin.import_role:
+        name: infra.aap_configuration.gateway_role_team_assignments
+
+    - name: Add users into teams
+      ansible.builtin.include_tasks: user_to_team_mapping.yml
+      with_items: "{{ users_to_teams_mapping }}"
+      when: users_to_teams_mapping.team_id is not none
