@@ -1,8 +1,0 @@
----
-- name: Add users into team
-  ansible.builtin.include_role:
-    name: infra.aap_configuration.gateway_role_user_assignments
-  with_items: "{{ item.users }}"
-  loop_control:
-    loop_var: myuser
-  when: item.team_id != None
