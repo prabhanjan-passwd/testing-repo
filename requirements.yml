@@ -1,5 +1,5 @@
 ---
 roles:
   - name: infra.aap_configuration
-    source: https://console.redhat.com/ansible/automation-hub/repo/
+    source: https://console.redhat.com/ansible/automation-hub/
 
